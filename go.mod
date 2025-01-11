@@ -1,4 +1,4 @@
-module tui-datepicker
+module github.com/oschrenk/tui-datepicker
 
 go 1.23.3
 
