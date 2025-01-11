@@ -9,7 +9,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/muesli/termenv"
+	"golang.design/x/clipboard"
 	"golang.org/x/term"
 	"tui-datepicker/keymap"
 )
@@ -126,9 +126,11 @@ func (m model) View() string {
 	if m.selected {
 		output := fmt.Sprintf("%d/%02d/%02d\n", m.date.Year(), int(m.date.Month()), m.date.Day())
 
-        // TODO: if (x11)...
-		termenv.CopyPrimary(output)
-		termenv.Copy(output)
+		err := clipboard.Init()
+		if err != nil {
+			panic(err)
+		}
+		clipboard.Write(clipboard.FmtText, []byte(output))
 		return output
 	}
 
