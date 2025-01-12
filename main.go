@@ -58,8 +58,6 @@ func daysInMonth(year int, month time.Month) int {
 
 func firstDayOfMonth(year int, month time.Month) int {
 	return (int(time.Date(year, month, 1, 0, 0, 0, 0, time.UTC).Weekday()) + 6) % 7
-	// TODO: this return is work when week start from Sunday, so we can easy implement it
-	// return int(time.Date(year, month, 1, 0, 0, 0, 0, time.UTC).Weekday())
 }
 
 func initialModel() model {
@@ -184,15 +182,6 @@ func (m model) View() string {
 	} else if len(monthMap) == 5 {
 		s += "\n"
 	}
-
-	// currentWeekMap := m.monthMap()[m.week()]
-	// left := currentWeekMap[0]
-	// right := currentWeekMap[6]
-	// s += "\n"
-	// s += lipgloss.NewStyle().Render(fmt.Sprintf("day: %d\n", m.date.Day()))
-	// s += lipgloss.NewStyle().Render(fmt.Sprintf("left: %d\n", left))
-	// s += lipgloss.NewStyle().Render(fmt.Sprintf("right: %d\n", right))
-	// s += lipgloss.NewStyle().Render(fmt.Sprintf("week: %d\n", m.week()))
 
 	s += m.help.View(m.keys)
 
