@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"reflect"
 	"time"
 
 	"github.com/charmbracelet/bubbles/help"
@@ -17,6 +18,7 @@ import (
 type model struct {
 	date     time.Time
 	selected bool
+	result   string
 
 	keys keymap.KeyMap
 	help help.Model
@@ -64,6 +66,7 @@ func initialModel() model {
 	return model{
 		date:     time.Now(),
 		selected: false,
+		result:   "",
 
 		keys: keymap.Keys,
 		help: help.New(),
@@ -113,6 +116,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.date = m.date.AddDate(1, 0, 0)
 		case key.Matches(msg, m.keys.Select):
 			m.selected = true
+			m.result = formatSelected(m.date)
 			return m, tea.Quit
 		}
 	}
@@ -120,15 +124,20 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+func formatSelected(d time.Time) string {
+	return fmt.Sprintf("%d-%02d-%02d", d.Year(), int(d.Month()), d.Day())
+}
+
 func (m model) View() string {
 	if m.selected {
-		output := fmt.Sprintf("%d-%02d-%02d", m.date.Year(), int(m.date.Month()), m.date.Day())
+		output := formatSelected(m.date)
 
 		err := clipboard.Init()
 		if err != nil {
 			panic(err)
 		}
 		clipboard.Write(clipboard.FmtText, []byte(output))
+		m.result = output
 		return output
 	}
 
@@ -226,8 +235,11 @@ func (m model) monthMap() Month {
 
 func main() {
 	p := tea.NewProgram(initialModel(), tea.WithAltScreen())
-	if _, err := p.Run(); err != nil {
+	m, err := p.Run()
+	if err != nil {
 		fmt.Printf("Alas, there's been an error: %v", err)
 		os.Exit(1)
 	}
+	result := reflect.ValueOf(m).FieldByName("result").String()
+	fmt.Print(result)
 }
